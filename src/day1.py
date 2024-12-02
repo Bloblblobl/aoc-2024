@@ -1,5 +1,6 @@
 import bisect
 
+from collections import Counter
 from utils import get_input
 
 
@@ -24,8 +25,19 @@ def part1():
 
 
 def part2():
-    pass
+    locations = []
+    occurence = Counter()
+    for line in input:
+        loc, occ = line.split(SEPARATOR)
+        locations.append(int(loc))
+        occurence[int(occ)] += 1
 
+    result = 0
+    for location in locations:
+        result += location * occurence[location]
+    
+    print(result)
+    
 
 def main():
     part1()
