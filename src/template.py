@@ -1,4 +1,4 @@
-from .utils import get_input
+from utils import get_input
 
 input = get_input()
 
