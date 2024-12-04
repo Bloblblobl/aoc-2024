@@ -36,7 +36,18 @@ def part1():
 
 
 def part2():
-    pass
+    safe_count = 0
+    for line in input:
+        levels = [int(level) for level in line.split(" ")]
+        level_permutations = [levels]
+        for i in range(len(levels)):
+            new_levels = levels[:i] + levels[i + 1:]
+            level_permutations.append(new_levels)
+
+        if any(is_report_safe(lp) for lp in level_permutations):
+            safe_count += 1
+            
+    print(safe_count)
 
 
 def main():
