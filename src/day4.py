@@ -2,12 +2,12 @@ from collections import defaultdict
 from utils import get_input
 
 input = get_input()
+height = len(input) - 1
+width = len(input[0]) - 1
 
 
 def part1():
     search_term = "XMAS"
-    height = len(input) - 1
-    width = len(input[0]) - 1
 
     def out_of_range(x, y):
         return x < 0 or y < 0 or x > width or y > height
@@ -53,7 +53,40 @@ def part1():
 
 
 def part2():
-    pass
+    center = "A"
+    leg1 = "M"
+    leg2 = "S"
+
+    def get_search_patterns(start_x, start_y):
+        if not (0 < start_x < width and 0 < start_y < height):
+            return []
+
+        return [
+            ((start_x - 1, start_y - 1), (start_x + 1, start_y + 1)),
+            ((start_x + 1, start_y - 1), (start_x - 1, start_y + 1)),
+        ]
+
+    def char_at(x, y):
+        return input[y][x]
+
+    def is_x_leg(coord1, coord2):
+        chars = (char_at(*coord1), char_at(*coord2))
+        return leg1 in chars and leg2 in chars
+
+    result = 0
+    for y, line in enumerate(input):
+        for x, char in enumerate(line):
+            if char != center:
+                continue
+
+            search_patterns = get_search_patterns(x, y)
+            if not len(search_patterns):
+                continue
+
+            if all(is_x_leg(*p) for p in search_patterns):
+                result += 1
+
+    print(result)
 
 
 def main():
