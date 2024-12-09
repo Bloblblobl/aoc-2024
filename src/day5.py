@@ -46,7 +46,37 @@ def part1():
 
 
 def part2():
-    pass
+    dependencies, orderings = parse_input()
+    result = 0
+    for ordering in orderings:
+        is_valid = True
+        invalid_nums = set()
+        for num in ordering:
+            if num in invalid_nums:
+                is_valid = False
+                break
+
+            invalid_nums |= dependencies.get(num, set())
+
+        if is_valid:
+            continue
+
+        corrected_ordering = []
+        for num in ordering:
+            target_index = None
+            for i, cnum in enumerate(corrected_ordering):
+                if num in dependencies.get(cnum, set()):
+                    target_index = i
+                    break
+
+            if target_index is None:
+                corrected_ordering.append(num)
+            else:
+                corrected_ordering.insert(target_index, num)
+
+        result += int(corrected_ordering[len(corrected_ordering) // 2])
+
+    print(result)
 
 
 def main():
