@@ -57,8 +57,61 @@ def part1():
     print(len(guard_path))
 
 
+def simulate_path(obstacles, starting_state, state_history, check_for_loops):
+    loops = 0
+    is_looping = False
+
+    starting_pos = state_history[0][0] if len(state_history) else starting_state[0]
+
+    state = starting_state
+    while not out_of_bounds(*state[0]):
+        state_history.append(state)
+        pos, direction = state
+        next_pos = move(*pos, *direction)
+        if next_pos in obstacles:
+            direction = ROTATION[direction]
+            next_state = (pos, direction)
+        else:
+            if (
+                check_for_loops
+                and not out_of_bounds(*next_pos)
+                and next_pos not in obstacles
+                and next_pos != starting_pos
+                and next_pos not in [pos for pos, _ in state_history]
+            ):
+                loops += can_loop(obstacles, next_pos, state, list(state_history))
+            next_state = (next_pos, direction)
+
+        if next_state in state_history:
+            is_looping = True
+            break
+
+        state = next_state
+
+    return loops, is_looping
+
+
+def can_loop(obstacles, new_obstacle, current_state, state_history):
+    _, is_looping = simulate_path(
+        obstacles=obstacles | {new_obstacle},
+        starting_state=current_state,
+        state_history=list(state_history),
+        check_for_loops=False,
+    )
+    return is_looping
+
+
 def part2():
-    pass
+    obstacles, starting_pos, direction = parse_input()
+    starting_state = (starting_pos, direction)
+    state_history = []
+    loops, _ = simulate_path(
+        obstacles=obstacles,
+        starting_state=starting_state,
+        state_history=state_history,
+        check_for_loops=True,
+    )
+    print(loops)
 
 
 def main():
