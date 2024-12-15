@@ -57,7 +57,19 @@ def part1():
 
 
 def part2():
-    pass
+    OPERATORS = [
+        (lambda x, y: x + y, "+"),
+        (lambda x, y: x * y, "*"),
+        (lambda x, y: int(str(x) + str(y)), "||"),
+    ]
+    calibration_map = parse_input()
+    result = 0
+    for calibration_val, operands in calibration_map.items():
+        evals = evaluate_calibration(calibration_val, operands, OPERATORS)
+        if len(evals):
+            result += calibration_val
+
+    print(result)
 
 
 def main():
