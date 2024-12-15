@@ -52,6 +52,29 @@ def calculate_antinodes(antennas):
     return antinodes
 
 
+def calculate_antinodes2(antennas):
+    antinodes = set()
+    for i in range(len(antennas)):
+        for j in range(i + 1, len(antennas)):
+            a1 = antennas[i]
+            antinodes.add(a1)
+            a2 = antennas[j]
+            antinodes.add(a2)
+            diff = add(reverse(a1), a2)
+
+            an1 = add(a1, reverse(diff))
+            while in_bounds(an1):
+                antinodes.add(an1)
+                an1 = add(an1, reverse(diff))
+
+            an2 = add(a2, diff)
+            while in_bounds(an2):
+                antinodes.add(an2)
+                an2 = add(an2, diff)
+
+    return antinodes
+
+
 def part1():
     antenna_map = parse_input()
     antinodes = set()
@@ -62,7 +85,12 @@ def part1():
 
 
 def part2():
-    pass
+    antenna_map = parse_input()
+    antinodes = set()
+    for frequency, antennas in antenna_map.items():
+        antinodes |= calculate_antinodes2(antennas)
+
+    print(len(antinodes))
 
 
 def main():
