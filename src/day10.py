@@ -74,7 +74,13 @@ def part1():
 
 
 def part2():
-    pass
+    top_map, trailheads = parse_input()
+    result = 0
+    for trailhead in trailheads:
+        valid_paths = find_paths(top_map, trailhead)
+        result += len(valid_paths)
+
+    print(result)
 
 
 def main():
