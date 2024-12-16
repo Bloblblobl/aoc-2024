@@ -45,8 +45,67 @@ def part1():
     print(result)
 
 
+def parse_input2():
+    disk_map = []
+    filled_blocks = []
+    empty_blocks = []
+    file_id = 0
+    for index, c in enumerate(input[0]):
+        d = int(c)
+        disk_end = len(disk_map)
+        if index % 2 == 0:
+            disk_map.extend([file_id] * d)
+            filled_blocks.append((disk_end, d))
+            file_id += 1
+        else:
+            disk_map.extend(["."] * d)
+            empty_blocks.append((disk_end, d))
+
+    return disk_map, filled_blocks, empty_blocks
+
+
 def part2():
-    pass
+    disk_map, filled_blocks, empty_blocks = parse_input2()
+    for filled_index, filled_count in reversed(filled_blocks):
+        file_id = disk_map[filled_index]
+        if filled_index < empty_blocks[0][0]:
+            break
+
+        empty_block_index = 0
+        while empty_block_index < len(empty_blocks):
+            empty_index, empty_count = empty_blocks[empty_block_index]
+            if filled_index < empty_index:
+                break
+
+            if empty_count == filled_count:
+                for i in range(filled_count):
+                    disk_map[empty_index + i] = file_id
+                    disk_map[filled_index + i] = "."
+
+                del empty_blocks[empty_block_index]
+                break
+
+            elif filled_count < empty_count:
+                for i in range(filled_count):
+                    disk_map[empty_index + i] = file_id
+                    disk_map[filled_index + i] = "."
+
+                remaining = empty_count - filled_count
+                empty_blocks[empty_block_index] = (
+                    empty_index + filled_count,
+                    remaining,
+                )
+                break
+
+            empty_block_index += 1
+
+    result = 0
+    for i, c in enumerate(disk_map):
+        if c == ".":
+            continue
+        result += i * int(c)
+
+    print(result)
 
 
 def main():
