@@ -5,7 +5,13 @@ from utils import get_input
 input = get_input()
 HEIGHT = len(input)
 WIDTH = len(input[0])
-DIRECTIONS = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+UP = (0, -1)
+RIGHT = (1, 0)
+DOWN = (0, 1)
+LEFT = (-1, 0)
+
+DIRECTIONS = [UP, RIGHT, DOWN, LEFT]
 
 
 def parse_input():
@@ -80,8 +86,89 @@ def part1():
     print(result)
 
 
+def initialize_perimeter():
+    return {UP: [], RIGHT: [], DOWN: [], LEFT: []}
+
+
+def explore_region2(unvisited, map_chars, pos, symbol):
+    expanded_region = []
+    perimeter_directions = []
+    for dir in DIRECTIONS:
+        neighbor = move(pos, dir)
+        if in_bounds(neighbor) and char_at(map_chars, neighbor) == symbol:
+            if neighbor in unvisited:
+                expanded_region.append(neighbor)
+        else:
+            perimeter_directions.append(dir)
+
+    return expanded_region, perimeter_directions
+
+
+def map_region2(unvisited, map_chars):
+    start_pos = unvisited.pop(randint(0, len(unvisited) - 1))
+    symbol = char_at(map_chars, start_pos)
+    region = {
+        "symbol": symbol,
+        "coords": [start_pos],
+        "perimeter": initialize_perimeter(),
+    }
+    q = [start_pos]
+    while len(q):
+        curr_pos = q.pop(0)
+        expanded_region, perimeter_directions = explore_region2(
+            unvisited, map_chars, curr_pos, symbol
+        )
+        region["coords"].extend(expanded_region)
+        for dir in perimeter_directions:
+            region["perimeter"][dir].append(curr_pos)
+        for pos in expanded_region:
+            unvisited.remove(pos)
+        q.extend(expanded_region)
+
+    return region
+
+
+def get_orthogonals(dir):
+    return {
+        UP: [LEFT, RIGHT],
+        RIGHT: [UP, DOWN],
+        DOWN: [LEFT, RIGHT],
+        LEFT: [UP, DOWN],
+    }[dir]
+
+
+def calculate_perimeter_sides(region):
+    side_groups = initialize_perimeter()
+    perimeter = region["perimeter"]
+    for dir in DIRECTIONS:
+        orthogonals = get_orthogonals(dir)
+        visited = set()
+        for pos in sorted(perimeter[dir]):
+            if pos in visited:
+                continue
+            group = []
+            for orthogonal in orthogonals:
+                cursor = pos
+                while cursor in perimeter[dir]:
+                    group.append(cursor)
+                    visited.add(cursor)
+                    cursor = move(cursor, orthogonal)
+            side_groups[dir].append(group)
+
+    return side_groups
+
+
 def part2():
-    pass
+    map_coords, map_chars = parse_input()
+    unvisited = map_coords
+    result = 0
+    while len(unvisited):
+        region = map_region2(unvisited, map_chars)
+        perimeter_sides = calculate_perimeter_sides(region)
+        side_count = sum(len(side) for side in perimeter_sides.values())
+        result += len(region["coords"]) * side_count
+
+    print(result)
 
 
 def main():
