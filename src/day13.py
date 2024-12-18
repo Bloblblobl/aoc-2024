@@ -1,5 +1,3 @@
-import math
-
 from utils import get_input
 
 input = get_input()
@@ -49,36 +47,23 @@ def extract_values(config):
 
 
 def is_int(n):
-    return math.isclose(n, round(n))
+    return abs(n - round(n)) < 1e-4
 
 
-def get_move_count(config):
+def get_tokens(config, offset=0):
     ax, ay, bx, by, px, py = extract_values(config)
+    px += offset
+    py += offset
 
-    bn_top = py - (ay * px) / ax
-    bn_bot = by - (ay * bx) / ax
-    bn = bn_top / bn_bot
-
+    bn = (ax * py - ay * px) / (ax * by - ay * bx)
     an = (px - bx * bn) / ax
 
     a_close = is_int(an)
     b_close = is_int(bn)
     if not a_close or not b_close:
-        return None
-
-    return round(an), round(bn)
-
-
-def get_tokens(config):
-    move_count = get_move_count(config)
-    if move_count is None:
         return 0
 
-    an, bn = move_count
-    if an < 0 or bn < 0:
-        return 0
-
-    return 3 * an + bn
+    return int(3 * an + bn)
 
 
 def part1():
@@ -91,7 +76,13 @@ def part1():
 
 
 def part2():
-    pass
+    OFFSET = 10000000000000
+    configs = parse_input()
+    result = 0
+    for i, config in enumerate(configs):
+        result += get_tokens(config, offset=OFFSET)
+
+    print(result)
 
 
 def main():
